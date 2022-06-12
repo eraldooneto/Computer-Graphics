@@ -1,4 +1,4 @@
-from cmath import cos, sin
+from cmath import *
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -31,7 +31,7 @@ half_width = WINDOW_WIDHT / 2
 half_height = WINDOW_HEIGHT / 2
 
 
-def draw_wall(x0, y0, z0, x1, y1, z1):
+def draw_wall(x0, y0, z0, x1, y1, z1): # sem profundidade
     glBegin(GL_QUADS)
     glVertex3f(x0, y0, z0)
     glVertex3f(x1, y0, z1)
@@ -39,7 +39,7 @@ def draw_wall(x0, y0, z0, x1, y1, z1):
     glVertex3f(x0, y1, z0)
     glEnd()
 
-def draw_floor(x, y, z, width, length):
+def draw_floor(x, y, z, width, length): # sem profundidade
     glBegin(GL_QUADS)
     glVertex3f(x, y, z)
     glVertex3f(x, y, z + length)
@@ -107,7 +107,7 @@ def draw_cylinder(x, y, z, radius, height):
     #desenha tampa do cilindro
     glBegin(GL_POLYGON)
     c_angle = 0
-    while c_angle < 2*glm.pi():
+    while c_angle < 2 * glm.pi():
         px = radius * glm.cos(c_angle)
         pz = radius * glm.sin(c_angle)
         glVertex3f(x + px, y + height, z + pz)
@@ -222,23 +222,20 @@ def draw_triangle(x, y, z):
     glTranslatef(x, y, z)
 
     # lados
-    #glColor3ub(1, 1, 1)
-
     glPushMatrix()
-    glTranslatef(0, 0.1, 0)
+    glTranslatef(0, 0.3, 0)
     glRotatef(-60, 0, 0, 1)
-    draw_block(0, 0, 0, 0.1, 0.2, 9.85)
+    draw_block(0, 0, 0, 0.3, 0.2, 9.825)
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(17, 0.0, 0)
+    glTranslatef(16.9, 0.0, 0)
     glRotatef(60, 0, 0, 1)
-    draw_block(0, 0, 0, 0.1, 0.2, 9.85)
+    draw_block(0, 0, 0, 0.3, 0.2, 9.85)
     glPopMatrix()
     
     # base
-    #glColor3ub(1, 1, 1)
-    draw_block(0, 0, 0, 17, 0.2, 0.1)
+    draw_block(0, 0, 0, 17, 0.2, 0.3)
 
     glPopMatrix()
 
@@ -263,32 +260,52 @@ def draw_sc(x, y, z): # semi circle
     #glTranslatef(0, 0, 0)
     glRotatef(-90, 1, 0, 0)
     draw_hcylinder(0, 0, 0, 1.5, 0.1) # half cylinder
-    glPopMatrix() #end fan
+    glPopMatrix() #
     
-def draw_ihcylinder(x, y, z, radius, height): # invered half cylinder - arco
+def draw_ihcylinder(x, y, z, radius, height): # inverced half cylinder - arco
     px = 0.0
     pz = 0.0
     c_angle = 0.0
     angle_stepsize = 0.01
 
-    glColor3f(0.8, 0.6, 0.1)
-    #desenha a casca do cilindro
+    glPushMatrix()
+    #glColor3f(0.0, 0.0, 1.0) # azul
+    #desenha a casca interna do cilindro 1
+    glTranslatef(x+radius+0.22, y, z+radius) # x+radius+0.1
+    glRotatef(180, 0, 1, 0)
     glBegin(GL_QUAD_STRIP)
     c_angle = 0.0
-    while c_angle < glm.pi():
-        px = radius * glm.cos(c_angle)
-        pz = radius * glm.sin(c_angle)
+    while c_angle < glm.half_pi():
+        px = radius * glm.cos(c_angle)**3
+        pz = radius * glm.sin(c_angle)**3
         glVertex3f(x + px, y + height, z + pz)
         glVertex3f(x + px, y, z + pz)
         c_angle += angle_stepsize
     glEnd()
+    glPopMatrix()
 
-    glColor3ub(80, 80, 80)
-    #desenha o tampo de cima
-    x0 = x - radius
+    glPushMatrix()
+    #glColor3f(1.0, 0.0, 0.0) # vermelho
+    #desenha a casca interna do cilindro 2
+    glTranslatef(x-radius-0.22, y, z+radius) # x-radius-0.1
+    glRotatef(90, 0, 1, 0)
+    glBegin(GL_QUAD_STRIP)
+    c_angle = 0.0
+    while c_angle < glm.half_pi():
+        px = radius * glm.cos(c_angle)**3
+        pz = radius * glm.sin(c_angle)**3
+        glVertex3f(x + px, y + height, z + pz)
+        glVertex3f(x + px, y, z + pz)
+        c_angle += angle_stepsize
+    glEnd()
+    glPopMatrix()
+
+    #glColor3f(1.0, 1.0, 0.0) # amarelo
+    #desenha o tampo de cima - retangulo
+    x0 = x - radius - 0.22
     y0 = y 
     z0 = z + radius
-    x1 = x + radius
+    x1 = x + radius + 0.22
     y1 = y + height
     z1 = z + radius
     glBegin(GL_QUADS)
@@ -298,11 +315,12 @@ def draw_ihcylinder(x, y, z, radius, height): # invered half cylinder - arco
     glVertex3f(x0, y1, z0)
     glEnd()
 
-    # desenha a lateral a
-    x0 = x - radius
+    #glColor3f(0.0, 1.0, 0.0) # verde
+    # desenha a lateral a - retangulo
+    x0 = x - radius - 0.22
     y0 = y 
     z0 = z + radius
-    x1 = x - radius
+    x1 = x - radius - 0.22
     y1 = y + height
     z1 = z
     glBegin(GL_QUADS)
@@ -312,11 +330,12 @@ def draw_ihcylinder(x, y, z, radius, height): # invered half cylinder - arco
     glVertex3f(x0, y1, z0)
     glEnd()
 
-    # desenha a lateral b
-    x0 = x + radius
+    #glColor3f(1.0, 0.0, 1.0) # cyan
+    # desenha a lateral b - retangulo
+    x0 = x + radius + 0.22
     y0 = y + height 
     z0 = z + radius
-    x1 = x + radius
+    x1 = x + radius + 0.22
     y1 = y
     z1 = z
     glBegin(GL_QUADS)
@@ -326,26 +345,85 @@ def draw_ihcylinder(x, y, z, radius, height): # invered half cylinder - arco
     glVertex3f(x0, y1, z0)
     glEnd()
 
-    #desenha tampa do cilindro
+    #glColor3f(0.8, 0.6, 0.1) # laranja
+    # desenha tampa do cilindro 1
     px = 0.0
     pz = 0.0
-    x0 = x - radius
-    y0 = y 
-    z0 = z + radius
+    x0 = x - radius - 0.22 # x - radius - 0.1
+    y0 = y
+    z0 = z - radius
+    glRotatef(180, 0, 1, 0)
     glBegin(GL_POLYGON)
+    glVertex3f(x0, y0 + height, z0)
     c_angle = 0.0
-    while c_angle < glm.pi():
-        px = radius * glm.sin(c_angle)
-        pz = radius * glm.cos(c_angle)
+    while c_angle < glm.half_pi():
+        pz = radius * glm.sin(c_angle)**3
+        px = radius * glm.cos(c_angle)**3
         glVertex3f(x0 + px, y0 + height, z0 + pz)
         c_angle += angle_stepsize
     glEnd()
 
+    #glColor3f(0.6, 0.6, 0.6) # cinza
+    # desenha tampa do cilindro 2
+    px = 0.0
+    pz = 0.0
+    x0 = x - radius - 0.22 # x - radius - 0.1
+    y0 = y - height
+    z0 = z - radius
+
+    glBegin(GL_POLYGON)
+    glVertex3f(x0, y0 + height, z0)
+    c_angle = 0.0
+    while c_angle < glm.half_pi():
+        pz = radius * glm.sin(c_angle)**3
+        px = radius * glm.cos(c_angle)**3
+        glVertex3f(x0 + px, y0 + height, z0 + pz)
+        c_angle += angle_stepsize
+    glEnd()
+
+    #glColor3f(0.7, 0.1, 0.6) # roseo
+    #desenha tampa do cilindro 3
+    px = 0.0
+    pz = 0.0
+    x0 = x - radius - 0.22 #  x - radius - 0.1
+    y0 = y - 1
+    z0 = z - radius
+    glRotatef(180, 0, 1, 0)
+    glRotatef(180, 1, 0, 0)
+    glBegin(GL_POLYGON)
+    glVertex3f(x0, y0 + height, z0)
+    c_angle = 0.0
+    while c_angle < glm.half_pi():
+        pz = radius * glm.sin(c_angle)**3
+        px = radius * glm.cos(c_angle)**3
+        glVertex3f(x0 + px, y0 + height, z0 + pz)
+        c_angle += angle_stepsize
+    glEnd()
+
+    #glColor3f(0.6, 0.6, 0.6) # cinza
+    #desenha tampa do cilindro 4
+    px = 0.0
+    pz = 0.0
+    x0 = x - radius - 0.22 #  x - radius - 0.1
+    y0 = y -1 + height
+    z0 = z - radius
+
+    glBegin(GL_POLYGON)
+    glVertex3f(x0, y0 + height, z0)
+    c_angle = 0.0
+    while c_angle < glm.half_pi():
+        pz = radius * glm.sin(c_angle)**3
+        px = radius * glm.cos(c_angle)**3
+        glVertex3f(x0 + px, y0 + height, z0 + pz)
+        c_angle += angle_stepsize
+    glEnd()
+
+
 def draw_isc(x, y, z): # inverted semi circle
     glPushMatrix() #begin fan
-    #glTranslatef(x, y, z)
-    #glRotatef(-90, 1, 0, 0)
-    draw_ihcylinder(0, 0, 0, 1.5, 0.5) #motor
+    glTranslatef(x, y, z)
+    glRotatef(-90, 1, 0, 0)
+    draw_ihcylinder(0, 0, 0, 1.281, 0.5) # arco 1.5 -> 1.281
 
     glPopMatrix() #end fan
 
@@ -365,81 +443,87 @@ def display():
 
     glPushMatrix() # push bar
 
-    # Tentativa de arco
-    # glColor3f(0.8, 0.6, 0.1)
-    # draw_isc(3.5,4,25.5)
+    # Arco com astroide
+    glColor3f(0.78, 0.77, 0.74)
+    #draw_isc(0,0,0)
+    draw_isc(3.5,4,30.5)
+    draw_isc(8.5,4,30.5)
+    draw_isc(13.5,4,30.5)
 
-    # Tentativa do triangulo
 
     # parede do fundo
-    glColor3f(0.992, 0.768, 0.529)
-    draw_block(0, 0, 0, 17, 0.5, 6) # largura, comprimento, altura
+    #glColor3f(0.992, 0.768, 0.529)
+    #draw_block(0, 0, 0, 17, 0.5, 8) # largura, comprimento, altura
     
     # parede esquerda
-    glColor3f(0.964, 0.78, 0.474)
-    draw_block(0, 0, 0.5, 0.5, 29.5, 6) # largura, comprimento, altura
+    #glColor3f(0.964, 0.78, 0.474)
+    #draw_block(0, 0, 0.5, 0.5, 29.5, 8) # largura, comprimento, altura
     
     # parede direita
     glColor3f(0.964, 0.78, 0.474)
-    #draw_block(16.5, 0, 0.5, 0.5, 29.5, 6) # largura, comprimento, altura
-    draw_block(16.5, 0, 0.5,  0.5,   10, 6) # largura, comprimento, altura
+    #draw_block(16.5, 0, 0.5, 0.5, 29.5, 8) # largura, comprimento, altura
+    draw_block(16.5, 0, 0.5,  0.5,   10, 8) # largura, comprimento, altura
     draw_block(16.5, 0, 10.5, 0.5,    3, 3) # largura, comprimento, altura
-    draw_block(16.5, 0, 13.5, 0.5, 16.5, 6) # largura, comprimento, altura
-    draw_block(16.5, 5, 10.5, 0.5,   10, 1) # largura, comprimento, altura
+    draw_block(16.5, 0, 13.5, 0.5, 16.5, 8) # largura, comprimento, altura
+    draw_block(16.5, 5, 10.5, 0.5,   10, 3) # largura, comprimento, altura
     #janela
     glPushMatrix()
     glTranslatef(16.5, 3, 10.5)
     glRotatef(window_angle, 0, 1, 0)
     glColor3f(0.725, 0.870, 0.952)
-    draw_block(0, 0, 0, 0.2, 3, 2)
+    draw_block(0, 0, 0, 0.15, 3, 2)
     glPopMatrix()
     
     # piso
     glColor3f(0.921, 0.858,  0.717)
     draw_block(0.5, 0, 0.5, 16, 29.5, 0) # largura, comprimento, altura
 
-    # teto
+    # Teto
     glColor3f(0.905, 0.937, 0.901)
-    draw_block(0.5, 6, 0.5, 16, 29.5, 0) # largura, comprimento, altura
+    draw_block(0.5, 8, 0.5, 16, 29.5, 0) # largura, comprimento, altura
 
-    glColor3f(1.0, 1.0, 1.0)
-    draw_triangle(0, 6, 30.5)
+    # Triangulo da frente com os detalhes nas arestas
+    glColor3f(0.905, 0.937, 0.901)
+    draw_triangle(0, 9, 30.5)
 
-    # Triangulo da frente
+    glColor3f(0.78, 0.77, 0.74)
     glPushMatrix()
     glBegin(GL_POLYGON)
-    glVertex3f(0, 6, 30.51)
-    glVertex3f(8.5, 11, 30.51)
-    glVertex3f(17, 6, 30.51)
+    glVertex3f(0, 9, 30.51)
+    glVertex3f(8.5, 14, 30.51)
+    glVertex3f(17, 9, 30.51)
     glEnd()
     glPopMatrix()
+
+    # Base horizontal - Detalhe branco
+    glColor3f(0.905, 0.937, 0.901)
+    draw_block(0, 8, 30.5, 17, 0.2, 0.1)
+    glColor3f(1, 1, 1)
+    draw_wall(0, 7.7, 30.53, 17, 8, 30.53)
+    glColor3f(0.905, 0.937, 0.901)
+    draw_block(0, 7.7, 30.5, 17, 0.2, 0.1)
 
     # parede da frente
     # bloco 1
     glColor3f(0.78, 0.77, 0.74)
-    draw_block(0, 0, 30, 2, 0.5, 4) # largura, comprimento, altura
+    draw_block(0, 0, 30, 2, 0.5, 5.28) # largura, comprimento, altura
 
     # bloco 2
     glColor3f(0.78, 0.77, 0.74)
-    draw_block(5, 0, 30, 2, 0.5, 4) # largura, comprimento, altura
+    draw_block(5, 0, 30, 2, 0.5, 5.28) # largura, comprimento, altura
 
     # bloco 3
     glColor3f(0.78, 0.77, 0.74)
-    draw_block(10, 0, 30, 2, 0.5, 4) # largura, comprimento, altura
+    draw_block(10, 0, 30, 2, 0.5, 5.28) # largura, comprimento, altura
 
     # bloco 4
     glColor3f(0.78, 0.77, 0.74)
-    draw_block(15, 0, 30, 2, 0.5, 4) # largura, comprimento, altura
+    draw_block(15, 0, 30, 2, 0.5, 5.28) # largura, comprimento, altura
 
     # bloco 5 (cima - horizontal)
     glColor3f(0.78, 0.77, 0.74)
-    draw_block(0, 4, 30, 17, 0.5, 5) # largura, comprimento, altura
+    draw_block(0, 5.28, 30, 17, 0.5, 7) # largura, comprimento, altura
 
-    # arcos
-    glColor3f(1.0, 1.0, 1.0)
-    draw_sc(3.5,4,30.63)
-    draw_sc(8.5,4,30.63)
-    draw_sc(13.5,4,30.63)
 
     # palco
     glColor3f(0.6, 0.6, 0.6)
@@ -584,12 +668,6 @@ def mouse_camera(mouse_x, mouse_y):
 
     angle_x -= (mouse_x - old_mouse_x) * mouse_sensitivity
     angle_y -= (mouse_y - old_mouse_y) * mouse_sensitivity
-    '''
-    if angle_y > 2:
-        angle_y = 2
-    if angle_y < 1:
-        angle_y = 1
-    '''
 
     front = glm.vec3()
     front.x = glm.cos(angle_x) * glm.sin(angle_y)
