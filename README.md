@@ -16,6 +16,12 @@ Requisitadas para a execução:
 
 Como rodar o código: python3 Rex.py 
 
+Referências: 
+
+- https://learnopengl.com/
+- https://www.youtube.com/watch?v=W3gAzLwfIP0&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2
+- OpenGL Superbible 
+
 
 
 
